@@ -11,8 +11,8 @@ namespace DataBaseManager
     {
 
         //connection strings for source and destination databases
-        static public string? SourceConnection {  get; set; }
-        static public string? DestinationConnection { get; set; }
+        static public string? SourceConnection = null;
+        static public string? DestinationConnection = null;
 
         //Method Name: ValidateServerName
         //Description: validates the source connection string inputs
@@ -38,21 +38,28 @@ namespace DataBaseManager
         {
           return string.IsNullOrEmpty(tableName);
         }
-        //Method Name: BuildConnectionString
+        //Method Name: BuildSourceConnectionString
         //Description: inputs the server and database names into the connection string
         //Parameters:  string server - name of the server
         //             string database - name of database
         //Returns:     void
-        static public void BuildConnectionString(string server, string database)
+        static public void BuildSourceConnectionString(string server, string database)
         {
-           // string connectionStdfring =
-           //"Data Source=localhost\\SQLEXPRESS01;" +
-           //"Initial Catalog=Northwind;" +
-           //"Integrated Security=True;";
-            string connectionString = $"Data Source={server}; Initial Catalog={database}; Integrated Security=True;";
+            string connectionString = $"Data Source={server}; Initial Catalog={database}; Integrated Security=True;TrustServerCertificate=True;";
 
             SourceConnection = connectionString;
         }
+        //Method Name: BuildDestinationConnectionString
+        //Description: inputs the server and database names into the connection string
+        //Parameters:  string server - name of the server
+        //             string database - name of database
+        //Returns:     void
+        static public void BuildDestinationConnectionString(string server, string database)
+        {
+            string connectionString = $"Data Source={server}; Initial Catalog={database}; Integrated Security=True;";
 
+            DestinationConnection = connectionString;
+        }
+        
     }
 }
