@@ -98,7 +98,8 @@
                 Grid.Column="1"
                 Content="Check Source"
                 Width="150"
-                Margin="0,5,0,5"/>
+                Margin="0,5,0,5"
+                Click="CheckSource_OnClick"/>
 
         <!-- DESTINATION SECTION -->
 
@@ -145,13 +146,15 @@
                 Grid.Column="1"
                 Content="Check Destination"
                 Width="170"
-                Margin="0,5,0,5"/>
+                Margin="0,5,0,5"
+                Click="CheckDestination_OnClick"/>
 
         <Button Grid.Row="11"
                 Grid.Column="1"
                 Content="Transfer Data"
                 Width="170"
-                Margin="0,5,0,5"/>
+                Margin="0,5,0,5"
+                Click="TransferData_OnClick"/>
 
         <Label Grid.Row="12"
                Grid.Column="1"

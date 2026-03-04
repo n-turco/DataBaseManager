@@ -1,4 +1,11 @@
-﻿using System.Text;
+﻿/*  
+  FILE          : MainWindow.xaml.cs 
+  PROJECT       : PROG2126 - Assignment #2 (AsyncGuess)
+  PROGRAMMER    : Nick Turco
+  FIRST VERSION : 2026-03-02 
+  DESCRIPTION   : Main UI for the Client. Handles interactions between User and databases
+*/
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -21,5 +28,19 @@ namespace DataBaseManager
             InitializeComponent();
         }
 
+        private void CheckSource_OnClick(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void CheckDestination_OnClick(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void TransferData_OnClick(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
