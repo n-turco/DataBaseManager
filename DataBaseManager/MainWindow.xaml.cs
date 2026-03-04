@@ -30,7 +30,28 @@ namespace DataBaseManager
 
         private void CheckSource_OnClick(object sender, RoutedEventArgs e)
         {
-            
+            //clear error messages
+            SServerErrLbl.Content = "";
+            SDatabaseErrLbl.Content = "";
+            SDataTableErrLbl.Content = "";
+
+            //validate inputs
+            if (ConnectionString.ValidateServerName(SServerTxt.Text)) {
+                SServerErrLbl.Content = "Invalid Server Name";
+                return;
+            }
+            if(ConnectionString.ValidateDatabaseName(SDatabaseTxt.Text))
+            {
+                SDatabaseErrLbl.Content = "Invalid Database name";
+                return;
+            }
+            if(ConnectionString.ValidateTableName(SDataTableTxt.Text))
+            {
+                SDataTableErrLbl.Content = "Invalid table name";
+                return;
+            }
+            ConnectionString.BuildConnectionString(SServerTxt.Text, SDatabaseTxt.Text);
+
         }
 
         private void CheckDestination_OnClick(object sender, RoutedEventArgs e)
