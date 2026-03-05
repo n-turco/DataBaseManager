@@ -33,7 +33,6 @@ namespace DataBaseManager
             //clear error messages
             SServerErrLbl.Content = "";
             SDatabaseErrLbl.Content = "";
-            SDataTableErrLbl.Content = "";
 
             //validate inputs
             if (ConnectionString.ValidateServerName(SServerTxt.Text.Trim())) {
@@ -45,14 +44,7 @@ namespace DataBaseManager
                 SDatabaseErrLbl.Content = "Invalid Database name";
                 return;
             }
-            //if(ConnectionString.ValidateTableName(SDataTableTxt.Text))
-            //{
-            //    SDataTableErrLbl.Content = "Invalid table name";
-            //    return;
-            //}
-            //build the connection string
             ConnectionString.BuildSourceConnectionString(SServerTxt.Text.Trim(), SDatabaseTxt.Text.Trim());
-
         }
 
         private void CheckDestination_OnClick(object sender, RoutedEventArgs e)
@@ -60,7 +52,6 @@ namespace DataBaseManager
             //clear error messages
             DServerErrLbl.Content = "";
             DDatabaseErrLbl.Content = "";
-            DDataTableErrLbl.Content = "";
 
             //validate inputs
             if (ConnectionString.ValidateServerName(DServerTxt.Text.Trim()))
@@ -73,17 +64,15 @@ namespace DataBaseManager
                 DDatabaseErrLbl.Content = "Invalid Database name";
                 return;
             }
-            //if (ConnectionString.ValidateTableName(DDataTableTxt.Text))
-            //{
-            //    DDataTableErrLbl.Content = "Invalid table name";
-            //    return;
-            //}
-            //build the connection string
             ConnectionString.BuildDestinationConnectionString(DServerTxt.Text.Trim(), DDatabaseTxt.Text.Trim());
         }
 
         private void TransferData_OnClick(object sender, RoutedEventArgs e)
         {
+            if (ConnectionString.ValidateTableName(DataTableTxt.Text.Trim()))
+            {
+                DataTableErrLbl.Content = "Specifiy Table name to transfer data.";
+            }
             if (ConnectionString.SourceConnection != null) {
                 if (DataBaseServices.DataBaseExists(ConnectionString.SourceConnection))
                 {
