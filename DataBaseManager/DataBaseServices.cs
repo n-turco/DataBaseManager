@@ -4,6 +4,7 @@ using System.Text;
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Windows.Navigation;
 
 namespace DataBaseManager
 {
@@ -104,6 +105,35 @@ namespace DataBaseManager
             }
         }
 
-        
+        public static bool CompareSchema(DataTable sourceSchema, DataTable destinationSchema)
+        {
+            if(sourceSchema.Rows.Count != destinationSchema.Rows.Count)      //check for correct number of rows
+            {
+                return false; 
+            }
+            for (int i = 0; i < sourceSchema.Rows.Count; i++) //go through each row and compare name and type
+            {
+                DataRow src = sourceSchema.Rows[i];
+                DataRow dest = destinationSchema.Rows[i];
+
+                string? srcName = src["ColumnName"].ToString();
+                string? destName = dest["ColumnName"].ToString();
+
+                Type srcType = (Type)src["DataType"];
+                Type destType = (Type)dest["DataType"];
+
+                if (srcName != destName)
+                {
+                    return false;
+                }              
+                if (srcType != destType)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+
+        }
     }
 }

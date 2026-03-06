@@ -56,7 +56,7 @@ namespace DataBaseManager
         //Returns:     void
         static public void BuildDestinationConnectionString(string server, string database)
         {
-            string connectionString = $"Data Source={server}; Initial Catalog={database}; Integrated Security=True;";
+            string connectionString = $"Data Source={server}; Initial Catalog={database}; Integrated Security=True;TrustServerCertificate=True;";
 
             DestinationConnection = connectionString;
         }

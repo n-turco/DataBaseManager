@@ -31,11 +31,12 @@ namespace DataBaseManager
 
             ErrorLbl.Content = "";                      //clear error messages
 
-            if (ConnectionString.ValidateServerName(SServerTxt.Text.Trim())) {          //validate inputs
+            if (ConnectionString.ValidateServerName(SServerTxt.Text.Trim()))
+            {          //validate inputs
                 ErrorLbl.Content = "Invalid Server Name";
                 return;
             }
-            if(ConnectionString.ValidateDatabaseName(SDatabaseTxt.Text.Trim()))
+            if (ConnectionString.ValidateDatabaseName(SDatabaseTxt.Text.Trim()))
             {
                 ErrorLbl.Content = "Invalid Database name";
                 return;
@@ -43,7 +44,7 @@ namespace DataBaseManager
             ConnectionString.BuildSourceConnectionString(SServerTxt.Text.Trim(), SDatabaseTxt.Text.Trim());  //create connection string
             SServerLbl.Content = $"Source Server: {SServerTxt.Text.Trim()}";            //display server  
             SDatabaseLbl.Content = $"Source DB: {SDatabaseTxt.Text.Trim()}";            //display database
-   
+
             ErrorLbl.Content = "";              //clear labels and text input
             SServerTxt.Text = "";
             SDatabaseTxt.Text = "";
@@ -52,7 +53,7 @@ namespace DataBaseManager
         private void CheckDestination_OnClick(object sender, RoutedEventArgs e)
         {
             ErrorLbl.Content = "";           //clear error messages
-     
+
             if (ConnectionString.ValidateServerName(DServerTxt.Text.Trim()))         //validate inputs
             {
                 ErrorLbl.Content = "Invalid Server Name";
@@ -63,7 +64,7 @@ namespace DataBaseManager
                 ErrorLbl.Content = "Invalid Database name";
                 return;
             }
-            ConnectionString.BuildDestinationConnectionString(DServerTxt.Text.Trim(), DDatabaseTxt.Text.Trim());
+            ConnectionString.BuildDestinationConnectionString(DServerTxt.Text.Trim(), DDatabaseTxt.Text.Trim());  //build destination string
             DServerLbl.Content = $"Destination Server: {DServerTxt.Text.Trim()}\n";
             DDatabaseLbl.Content = $"Destination DB: {DDatabaseTxt.Text.Trim()}";
 
@@ -74,77 +75,82 @@ namespace DataBaseManager
 
         private void TransferData_OnClick(object sender, RoutedEventArgs e)
         {
-            
+
             if (ConnectionString.ValidateTableName(STableTxt.Text.Trim()))      //validate source table
             {
                 MessageBox.Show("Specify source table name");
                 return;
-            } else
+            }
+            else
             {
                 DataBaseServices.SourceTableName = STableTxt.Text.Trim();
             }
-            
-            if (ConnectionString.SourceConnection != null)                //check Source Connection strings exist
-                {           
-                if (DataBaseServices.DataBaseExists(ConnectionString.SourceConnection))       //check Source Databases exist
-                {    
-                    if (DataBaseServices.DatabaseTableExists(DataBaseServices.SourceTableName, ConnectionString.SourceConnection))   //check if table exists and get schema
-                    {
-                       if(DataBaseServices.GetSchema(DataBaseServices.SourceTableName, ConnectionString.SourceConnection, out DataTable sTbl))
-                        {
-                            //compare source schema to destination schema
-                            //if it is the same, copy data
-                            //if it is not abort
-                            //if table does not exist create one with source schema
-                        }
-                        else
-                        {
-                            MessageBox.Show("Failed to get table schema.");
-                            return;
-                        }
-                    } 
-                    else
-                    {
-                        MessageBox.Show("Source table does not exist.");
-                        return;
-                    }
-                    
-                    //copy table data, if data fails to copy, rollback
-                } 
-                else
-                {
-                    MessageBox.Show("Database does not exists");
-                    return;
-                }                 
-            } 
+
+            if (ConnectionString.ValidateTableName(DTableTxt.Text.Trim()))      //validate destination table
+            {
+                MessageBox.Show("Specify destination table name");
+                return;
+            }
             else
+            {
+                DataBaseServices.DestinationTableName = DTableTxt.Text.Trim();
+            }
+
+            if (ConnectionString.SourceConnection == null || ConnectionString.DestinationConnection == null)            //check connection strings exist    
             {
                 MessageBox.Show("Invalid connection string.");
                 return;
             }
-            if (ConnectionString.ValidateTableName(DTableTxt.Text.Trim()))      //validate destination table
+
+            if (!DataBaseServices.DataBaseExists(ConnectionString.SourceConnection))       //check Source Databases exist
             {
-                MessageBox.Show("Specify destination table name");      
+                MessageBox.Show("Source database not found.");
                 return;
             }
 
-            if (ConnectionString.DestinationConnection != null)         //check DestinationConnection string exists
+            if (!DataBaseServices.DatabaseTableExists(DataBaseServices.SourceTableName, ConnectionString.SourceConnection))   //check if table exists 
             {
-                if (DataBaseServices.DataBaseExists(ConnectionString.DestinationConnection))    //check Destination Database exists
-                {
-                    //check if table exists
-
-                    //if table does not exist, create table in destination database
-                    //if table exists check schema, if it does not match notify user 
-                    //if table exists and schema matches source, copy data, if data fails to copy, rollback
-
-                }
-                else 
-                {
-                    MessageBox.Show("Database does not exists");
-                    return;
-                }
+                MessageBox.Show("Source table not found.");
+                return;
             }
+
+            if (!DataBaseServices.GetSchema(DataBaseServices.SourceTableName, ConnectionString.SourceConnection, out DataTable sTbl))   //get source schema
+            {
+                MessageBox.Show("Failed to get table schema.");
+                return;
+            }
+
+            if (!DataBaseServices.DataBaseExists(ConnectionString.DestinationConnection))       //get destination db
+            {
+                MessageBox.Show("Destination database not found.");
+                return;
+            }
+
+            if (!DataBaseServices.DatabaseTableExists(DataBaseServices.DestinationTableName, ConnectionString.DestinationConnection)) //check destination table
+            {
+               //create table
+               //send data, roll back on fail
+            } 
+
+            if (!DataBaseServices.GetSchema(DataBaseServices.DestinationTableName, ConnectionString.DestinationConnection, out DataTable dTbl)) //get dest schema
+            {
+                MessageBox.Show("Failed to get table schema.");
+                return;
+            }
+
+            if (!DataBaseServices.CompareSchema(sTbl, dTbl))        //compare source and destination schemas
+            {
+                MessageBox.Show("Table schema does not match.");
+                return;
+            }
+            else
+            {
+                //copy data, if it fails, roll back
+            }
+
+
+
+
         }
     }
 }
