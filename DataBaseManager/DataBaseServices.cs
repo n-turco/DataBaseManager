@@ -131,9 +131,78 @@ namespace DataBaseManager
                     return false;
                 }
             }
-
             return true;
-
         }
+
+        public static string BuildCreateTableQuery(string tableName, DataTable schema)
+        {
+            List<string> columns = new();               //create list to store schema
+
+            foreach (DataRow row in schema.Rows)        //iterate through list and get the column names, data type, size and null option
+            {
+                string? columnName = row["ColumnName"].ToString();
+                Type dataType = (Type)row["DataType"];
+                int columnSize = row["ColumnSize"] != DBNull.Value ? (int)row["ColumnSize"] : 0;
+                bool allowNull = row["AllowDBNull"] != DBNull.Value && (bool)row["AllowDBNull"];
+
+                string sqlType = ConvertToSqlType(dataType, columnSize);            //converts to sql data types
+
+                string nullText = allowNull ? "NULL" : "NOT NULL";
+
+                columns.Add($"[{columnName}] {sqlType} {nullText}");        //add each rows data to the list
+            }
+
+            string columnList = string.Join(", ", columns);                 //convert the list to a single string to be sent to destination db
+
+            return $"CREATE TABLE dbo.[{tableName}] ({columnList})";        //return the query string
+        }
+
+        public static string ConvertToSqlType(Type type, int size)
+        {
+            if (type == typeof(int))
+                return "INT";
+
+            if (type == typeof(long))
+                return "BIGINT";
+
+            if (type == typeof(short))
+                return "SMALLINT";
+
+            if (type == typeof(bool))
+                return "BIT";
+
+            if (type == typeof(DateTime))
+                return "DATETIME";
+
+            if (type == typeof(decimal))
+                return "DECIMAL(18,2)";
+
+            if (type == typeof(double))
+                return "FLOAT";
+
+            if (type == typeof(string))
+                return size > 0 ? $"NVARCHAR({size})" : "NVARCHAR(MAX)";
+
+            return "NVARCHAR(MAX)";  //fall back it type is not recognized
+        }
+        public static bool CreateTableFromSchema(string tableName, DataTable schema, string connectionString)
+        {
+            string createQuery = BuildCreateTableQuery(tableName, schema); //create the query string
+            try
+            {
+                using SqlConnection conn = new(connectionString);
+                conn.Open();
+
+                using SqlCommand cmd = new(createQuery, conn);
+                cmd.ExecuteNonQuery();                              //execute query
+                return true;    
+            }
+            catch 
+            { 
+                return false;
+            }
+                         
+        }
+
     }
 }

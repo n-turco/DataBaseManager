@@ -128,9 +128,13 @@ namespace DataBaseManager
 
             if (!DataBaseServices.DatabaseTableExists(DataBaseServices.DestinationTableName, ConnectionString.DestinationConnection)) //check destination table
             {
-               //create table
-               //send data, roll back on fail
-            } 
+               if(!DataBaseServices.CreateTableFromSchema(DataBaseServices.DestinationTableName, sTbl, ConnectionString.DestinationConnection))
+                {
+                    MessageBox.Show("Failed to create table");
+                    return;
+                }
+                //send data, roll back on fail
+            }
 
             if (!DataBaseServices.GetSchema(DataBaseServices.DestinationTableName, ConnectionString.DestinationConnection, out DataTable dTbl)) //get dest schema
             {
@@ -145,6 +149,7 @@ namespace DataBaseManager
             }
             else
             {
+                MessageBox.Show("Schema the same");
                 //copy data, if it fails, roll back
             }
 
