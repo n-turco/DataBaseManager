@@ -5,6 +5,7 @@ using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Windows.Navigation;
+using System.CodeDom;
 
 namespace DataBaseManager
 {
@@ -136,7 +137,7 @@ namespace DataBaseManager
 
         public static string BuildCreateTableQuery(string tableName, DataTable schema)
         {
-            List<string> columns = new();               //create list to store schema
+            List<string> columns = [];               //create list to store schema
 
             foreach (DataRow row in schema.Rows)        //iterate through list and get the column names, data type, size and null option
             {
@@ -202,6 +203,45 @@ namespace DataBaseManager
                 return false;
             }
                          
+        }
+
+        public static bool CopyTableData(string sourceConnectionString, string destinationConnectionString, string tableName)
+        {
+            using SqlConnection sourceConnection = new(sourceConnectionString);               //connect to the source and destination
+            using SqlConnection destinationConnection = new(destinationConnectionString);
+            SqlTransaction? transaction = null;                                         //use transaction for rollback
+
+            try
+            {
+                sourceConnection.Open();                            
+                destinationConnection.Open();
+
+                transaction = destinationConnection.BeginTransaction();             //begin the transaction
+
+                string selectQuery = "SELECT * FROM dbo.[" + SourceTableName + "]";
+                using SqlCommand selectCommand = new(selectQuery, sourceConnection);
+
+                using SqlDataReader reader = selectCommand.ExecuteReader(); //read what the command brings back
+
+                using SqlBulkCopy bulkCopy = new(destinationConnection, SqlBulkCopyOptions.Default, transaction); //setup the bulk copy
+
+                bulkCopy.DestinationTableName = "dbo.[" + tableName + "]";
+
+                bulkCopy.WriteToServer(reader);         //write the data to the recieving db
+
+                transaction.Commit();                   //commit if everything goes well
+
+                return true;
+            }
+            catch
+            {
+                transaction?.Rollback();         //only roll back if there is an actual transaction created
+
+                sourceConnection.Close();
+                destinationConnection.Close();
+
+                return false;
+            }
         }
 
     }

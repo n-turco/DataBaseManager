@@ -108,13 +108,16 @@ namespace DataBaseManager
                 return;
             }
 
-            if (!DataBaseServices.DatabaseTableExists(DataBaseServices.SourceTableName, ConnectionString.SourceConnection))   //check if table exists 
+            if (!DataBaseServices.DatabaseTableExists(DataBaseServices.SourceTableName, 
+                                                      ConnectionString.SourceConnection))   //check if table exists 
             {
                 MessageBox.Show("Source table not found.");
                 return;
             }
 
-            if (!DataBaseServices.GetSchema(DataBaseServices.SourceTableName, ConnectionString.SourceConnection, out DataTable sTbl))   //get source schema
+            if (!DataBaseServices.GetSchema(DataBaseServices.SourceTableName, 
+                                            ConnectionString.SourceConnection, 
+                                            out DataTable sTbl))   //get source schema
             {
                 MessageBox.Show("Failed to get table schema.");
                 return;
@@ -126,17 +129,29 @@ namespace DataBaseManager
                 return;
             }
 
-            if (!DataBaseServices.DatabaseTableExists(DataBaseServices.DestinationTableName, ConnectionString.DestinationConnection)) //check destination table
+            if (!DataBaseServices.DatabaseTableExists(DataBaseServices.DestinationTableName, 
+                                                      ConnectionString.DestinationConnection))      //check destination table
             {
-               if(!DataBaseServices.CreateTableFromSchema(DataBaseServices.DestinationTableName, sTbl, ConnectionString.DestinationConnection))
+               if(!DataBaseServices.CreateTableFromSchema(DataBaseServices.DestinationTableName, 
+                                                          sTbl, 
+                                                          ConnectionString.DestinationConnection))
                 {
                     MessageBox.Show("Failed to create table");
                     return;
                 }
-                //send data, roll back on fail
+                if(!DataBaseServices.CopyTableData(ConnectionString.SourceConnection, 
+                                                   ConnectionString.DestinationConnection, 
+                                                   DataBaseServices.DestinationTableName))
+                {
+                    MessageBox.Show("Failed to copy table data, roll back invoked.");
+                    return;
+                }
+                MessageBox.Show($"Successfully copied table data to {DataBaseServices.DestinationTableName}");
             }
 
-            if (!DataBaseServices.GetSchema(DataBaseServices.DestinationTableName, ConnectionString.DestinationConnection, out DataTable dTbl)) //get dest schema
+            if (!DataBaseServices.GetSchema(DataBaseServices.DestinationTableName, 
+                                            ConnectionString.DestinationConnection, 
+                                            out DataTable dTbl))                    //get dest schema
             {
                 MessageBox.Show("Failed to get table schema.");
                 return;
@@ -149,13 +164,16 @@ namespace DataBaseManager
             }
             else
             {
-                MessageBox.Show("Schema the same");
-                //copy data, if it fails, roll back
+                if (!DataBaseServices.CopyTableData(ConnectionString.SourceConnection, 
+                                                    ConnectionString.DestinationConnection, 
+                                                    DataBaseServices.DestinationTableName))
+                {
+                    MessageBox.Show("Failed to copy table data, roll back invoked.");
+                    return;
+                }
+                MessageBox.Show($"Successfully copied table data to {DataBaseServices.DestinationTableName}");
+                return;
             }
-
-
-
-
         }
     }
 }
