@@ -1,9 +1,10 @@
 ﻿/*  
   FILE          : MainWindow.xaml.cs 
-  PROJECT       : PROG2126 - Assignment #2 (AsyncGuess)
-  PROGRAMMER    : Nick Turco
-  FIRST VERSION : 2026-03-02 
-  DESCRIPTION   : Main UI for the Client. Handles interactions between User and databases
+  PROJECT       : PROG3070 - A03 – PROGRAMMING ABSTRACTIONS
+  PROGRAMMER    : Nick Turco | 9056530
+  FIRST VERSION : 2026-03-03 
+  DESCRIPTION   : This class handles the UI interactions from the client, it retrieves the server, database and tables from both the source
+                  and destination. It notifies the user on incorrect inputs and successful actions.
 */
 using System.Data;
 using System.Text;
@@ -25,7 +26,10 @@ namespace DataBaseManager
         {
             InitializeComponent();
         }
-
+        //Method Name: CheckSource_OnClick
+        //Description: This method checks that the source server and database inputs are valid
+        //             It gets the user input for the source server and db
+        //             Then it creates a connection string with it
         private void CheckSource_OnClick(object sender, RoutedEventArgs e)
         {
 
@@ -49,7 +53,10 @@ namespace DataBaseManager
             SServerTxt.Text = "";
             SDatabaseTxt.Text = "";
         }
-
+        //Method Name: CheckDestination_OnClick
+        //Description: This method checks that the destination server and database inputs are valid
+        //             It gets the user input for the destination server and db
+        //             Then it creates a connection string with it
         private void CheckDestination_OnClick(object sender, RoutedEventArgs e)
         {
             ErrorLbl.Content = "";           //clear error messages
@@ -72,7 +79,15 @@ namespace DataBaseManager
             DDatabaseTxt.Text = "";
             DServerTxt.Text = "";
         }
-
+        //Method Name: TransferData_OnClick
+        //Description: This method intiates the transfer of data between databases
+        //             It checks the connection strings and tables are valid
+        //             Then it checks if the databases and tables exist
+        //             It then gets the schema from the source db which is used to compare to destination db
+        //             It checks if the table exists at the destination, if it does it compares the schemas,
+        //             if it does not it creates the table with the source table schema
+        //             If the schema's don't match the transfer is cancelled and the user notified
+        //             If schema's match the data is copied to the table
         private void TransferData_OnClick(object sender, RoutedEventArgs e)
         {
 
@@ -139,9 +154,7 @@ namespace DataBaseManager
                     MessageBox.Show("Failed to create table");
                     return;
                 }
-                if(!DataBaseServices.CopyTableData(ConnectionString.SourceConnection, 
-                                                   ConnectionString.DestinationConnection, 
-                                                   DataBaseServices.DestinationTableName))
+                if(!DataBaseServices.CopyTableData())
                 {
                     MessageBox.Show("Failed to copy table data, roll back invoked.");
                     return;
@@ -164,9 +177,7 @@ namespace DataBaseManager
             }
             else
             {
-                if (!DataBaseServices.CopyTableData(ConnectionString.SourceConnection, 
-                                                    ConnectionString.DestinationConnection, 
-                                                    DataBaseServices.DestinationTableName))
+                if (!DataBaseServices.CopyTableData())
                 {
                     MessageBox.Show("Failed to copy table data, roll back invoked.");
                     return;

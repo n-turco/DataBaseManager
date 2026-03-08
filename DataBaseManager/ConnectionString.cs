@@ -1,4 +1,11 @@
-﻿using System;
+﻿/*  
+  FILE          : ConnectionString.cs 
+  PROJECT       : PROG3070 - A03 – PROGRAMMING ABSTRACTIONS
+  PROGRAMMER    : Nick Turco | 9056530
+  FIRST VERSION : 2026-03-03 
+  DESCRIPTION   : This class handles the validation and building of the source and destination connection strings
+*/
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
